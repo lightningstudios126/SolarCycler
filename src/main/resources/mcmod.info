@@ -1,0 +1,16 @@
+[
+{
+  "modid": "solarcycler",
+  "name": "SolarCycler",
+  "description": "Standalone mod to allow players to change the time of day.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["lightningstudios"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
