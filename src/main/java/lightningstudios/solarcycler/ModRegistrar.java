@@ -1,9 +1,11 @@
 package lightningstudios.solarcycler;
 
 import lightningstudios.solarcycler.block.BlockBase;
+import lightningstudios.solarcycler.block.BlockSolarCycler;
 import lightningstudios.solarcycler.item.ItemBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -14,8 +16,9 @@ public class ModRegistrar {
     public static ArrayList<ItemBase> itemsToRegister = new ArrayList<>();
     public static ArrayList<BlockBase> blocksToRegister = new ArrayList<>();
     
-    public static Item sunstone = new ItemBase("sunstone");
-    public static Block block_sunstone = new BlockBase(Material.IRON, "block_sunstone");
+    public static Item sunstone = new ItemBase("sunstone").setCreativeTab(CreativeTabs.MATERIALS);
+    public static Block block_sunstone = new BlockBase(Material.IRON, "block_sunstone").setLightLevel(1.0F).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+    public static Block solar_cycler = new BlockSolarCycler("solar_cycler").setLightLevel(1.0F).setCreativeTab(CreativeTabs.REDSTONE);
     
     public static void addItemToRegister(ItemBase itemBase) {
         itemsToRegister.add(itemBase);

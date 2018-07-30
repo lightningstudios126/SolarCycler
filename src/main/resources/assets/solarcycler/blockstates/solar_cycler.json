@@ -1,0 +1,18 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "side": "solarcycler:blocks/solar_cycler_side",
+      "top": "solarcycler:blocks/solar_cycler_top",
+      "bottom": "solarcycler:blocks/solar_cycler_bottom"
+    }
+  },
+  "variants": {
+    "normal": {
+      "model": "minecraft:cube_bottom_top"
+    },
+    "inventory": {
+      "model": "minecraft:cube_bottom_top"
+    }
+  }
+}
