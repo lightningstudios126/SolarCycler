@@ -14,16 +14,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 public class BlockSolarCycler extends BlockBase {
     
     public static long ticksPerDay = 24000L;
-    public static int timeToSet = 6000;
     
     public BlockSolarCycler(String name) {
         super(Material.IRON, name);
@@ -41,12 +42,6 @@ public class BlockSolarCycler extends BlockBase {
         return true;
     }
     
-    void setTime(World worldIn, int time) {
-        // skips to the next day at the specified time
-        worldIn.setWorldTime((worldIn.getWorldTime() / ticksPerDay + 1) * ticksPerDay + time);
-    
-    }
-    
     @Override
     public boolean hasTileEntity(IBlockState state) {
         return true;
@@ -60,36 +55,65 @@ public class BlockSolarCycler extends BlockBase {
     
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        // drop inventory on breakage
         TileEntitySolarCycler tile = ((TileEntitySolarCycler) worldIn.getTileEntity(pos));
         IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         ItemStack stack = itemHandler.getStackInSlot(0);
-        if (!stack.isEmpty()) {
-            EntityItem item = new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
-            worldIn.spawnEntity(item);
-        }
+        if (!stack.isEmpty())
+            worldIn.spawnEntity(new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack));
         super.breakBlock(worldIn, pos, state);
     }
     
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        boolean powered = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up());
-        
-        if (powered) {
-            setTime(worldIn, ((TileEntitySolarCycler) worldIn.getTileEntity(pos)).getTargetTime());
-            EntityLightningBolt bolt = new EntityLightningBolt(worldIn, pos.getX(), pos.getY() + 1, pos.getZ(), true);
-            worldIn.addWeatherEffect(bolt);
-            worldIn.spawnEntity(bolt);
+        updateRedstone(worldIn, pos);
+    }
+    
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        updateRedstone(worldIn, pos);
+    }
+    
+    @Override
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
+        if (world instanceof World)
+            updateRedstone(((World) world), pos);
+    }
+    
+    private void updateRedstone(World worldIn, BlockPos pos) {
+        if (!worldIn.isRemote) {
+            TileEntity temp = worldIn.getTileEntity(pos);
+            if (temp instanceof TileEntitySolarCycler) {
+                TileEntitySolarCycler tile = ((TileEntitySolarCycler) temp);
+                boolean powered = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
+                boolean wasPowered = tile.getRedstone();
+                if (powered && !wasPowered) {
+                    worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
+                    tile.setRedstonePower(true);
+                } else if (!powered && wasPowered)
+                    tile.setRedstonePower(false);
+            }
         }
-        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
     }
     
     @Override
-    public boolean hasComparatorInputOverride(IBlockState state) {
-        return super.hasComparatorInputOverride(state);
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        if (!worldIn.isRemote) {
+            TileEntity temp = worldIn.getTileEntity(pos);
+            if (temp instanceof TileEntitySolarCycler)
+                changeTime(worldIn, pos);
+        }
     }
     
-    @Override
-    public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos) {
-        return super.getComparatorInputOverride(blockState, worldIn, pos);
+    void setWorldTime(World worldIn, int time) {
+        boolean skipNextDay = worldIn.getWorldTime() % ticksPerDay > time;
+        worldIn.setWorldTime((worldIn.getWorldTime() / ticksPerDay + (skipNextDay ? 1 : 0)) * ticksPerDay + time);
+    }
+    
+    private void changeTime(World worldIn, BlockPos pos) {
+        setWorldTime(worldIn, ((TileEntitySolarCycler) worldIn.getTileEntity(pos)).getTargetTime());
+        EntityLightningBolt bolt = new EntityLightningBolt(worldIn, pos.getX(), pos.getY() + 1, pos.getZ(), true);
+        worldIn.addWeatherEffect(bolt);
+        worldIn.spawnEntity(bolt);
     }
 }

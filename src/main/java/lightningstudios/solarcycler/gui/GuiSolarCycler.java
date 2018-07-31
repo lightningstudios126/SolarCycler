@@ -2,6 +2,7 @@ package lightningstudios.solarcycler.gui;
 
 import lightningstudios.solarcycler.ModRegistrar;
 import lightningstudios.solarcycler.SolarCycler;
+import lightningstudios.solarcycler.tile.TileEntitySolarCycler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -13,30 +14,25 @@ import net.minecraft.util.ResourceLocation;
 public class GuiSolarCycler extends GuiContainer {
     
     private static final ResourceLocation BG_TEXTURE = new ResourceLocation(SolarCycler.MODID, "textures/gui/solarcycler.png");
-    
+    private final TileEntitySolarCycler tile;
     private InventoryPlayer playerInv;
     
     public GuiSolarCycler(Container container, InventoryPlayer playerInv) {
         super(container);
+        this.tile = ((ContainerSolarCycler) container).getTile();
         this.playerInv = playerInv;
     }
     
     @Override
     public void initGui() {
         super.initGui();
-        int[][] buttonPos = {
-                {57, 37},
-                {78, 16},
-                {99, 37},
-                {78, 58}
-        };
-        
-        for (int i = 0; i < 4; i++) {
+        int[][] buttonPos = {{57, 37}, {78, 16}, {99, 37}, {78, 58}};
+    
+        for (int i = 0; i < 4; i++)
             buttonList.add(new TextureButton(BG_TEXTURE, i,
-                    this.guiLeft + buttonPos[i][0], this.guiTop + buttonPos[i][1],
+                    guiLeft + buttonPos[i][0], guiTop + buttonPos[i][1],
                     i * 20 + 176, 0, 20, 20,
                     I18n.format("buttons.tooltip." + i)));
-        }
     }
     
     @Override
@@ -63,5 +59,18 @@ public class GuiSolarCycler extends GuiContainer {
         for (GuiButton button : this.buttonList)
             if (button instanceof TextureButton)
                 ((TextureButton) button).drawHover(mouseX, mouseY);
+    }
+    
+    @Override
+    public void updateScreen() {
+        for (GuiButton button : buttonList) {
+            button.enabled = button.id != tile.getSelectedButton().ordinal();
+        }
+    }
+    
+    @Override
+    protected void actionPerformed(GuiButton button) {
+        ModRegistrar.sendButtonPacket(tile, TileEntitySolarCycler.EnumButtons.values()[button.id]);
+        tile.updateButton(TileEntitySolarCycler.EnumButtons.values()[button.id]);
     }
 }

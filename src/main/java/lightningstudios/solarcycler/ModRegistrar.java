@@ -6,6 +6,7 @@ import lightningstudios.solarcycler.gui.ContainerSolarCycler;
 import lightningstudios.solarcycler.gui.GuiSolarCycler;
 import lightningstudios.solarcycler.item.ItemBase;
 import lightningstudios.solarcycler.item.ItemSunstone;
+import lightningstudios.solarcycler.network.PacketButton;
 import lightningstudios.solarcycler.tile.TileEntitySolarCycler;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -13,10 +14,15 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
@@ -24,13 +30,19 @@ import java.util.ArrayList;
 
 public class ModRegistrar implements IGuiHandler {
     
+    public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(SolarCycler.MODID);
+    
     public static final int GUI_SOLAR_CYCLER = 1;
     
     public static ArrayList<ItemBase> itemsToRegister = new ArrayList<>();
     public static ArrayList<BlockBase> blocksToRegister = new ArrayList<>();
     
-    public static Item sunstone = new ItemSunstone("sunstone").setCreativeTab(CreativeTabs.MATERIALS);
-    public static Block block_sunstone = new BlockBase(Material.IRON, "block_sunstone").setLightLevel(1.0F).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+    static {
+        // initialize using the registering constructor built into the base classes
+        new ItemSunstone("sunstone").setCreativeTab(CreativeTabs.MATERIALS);
+        new BlockBase(Material.IRON, "block_sunstone").setLightLevel(1.0F).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+    }
+    
     public static Block solar_cycler = new BlockSolarCycler("solar_cycler").setLightLevel(1.0F).setCreativeTab(CreativeTabs.REDSTONE);
     
     public static void addItemToRegister(ItemBase itemBase) {
@@ -61,15 +73,13 @@ public class ModRegistrar implements IGuiHandler {
             block.registerItemModel();
     }
     
-    @Nullable
-    @Override
-    public Container getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        switch (ID) {
-            case GUI_SOLAR_CYCLER:
-                return new ContainerSolarCycler(player.inventory, (TileEntitySolarCycler) world.getTileEntity(new BlockPos(x, y, z)));
-            default:
-                return null;
-        }
+    @SideOnly(Side.CLIENT)
+    public static void sendButtonPacket(TileEntity tile, TileEntitySolarCycler.EnumButtons buttonID) {
+        INSTANCE.sendToServer(new PacketButton(tile.getPos(), tile.getWorld().provider.getDimension(), buttonID));
+    }
+    
+    public static void registerMessages() {
+        INSTANCE.registerMessage(PacketButton.Handler.class, PacketButton.class, 0, Side.SERVER);
     }
     
     @Nullable
@@ -78,6 +88,17 @@ public class ModRegistrar implements IGuiHandler {
         switch (ID) {
             case GUI_SOLAR_CYCLER:
                 return new GuiSolarCycler(getServerGuiElement(ID, player, world, x, y, z), player.inventory);
+            default:
+                return null;
+        }
+    }
+    
+    @Nullable
+    @Override
+    public Container getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        switch (ID) {
+            case GUI_SOLAR_CYCLER:
+                return new ContainerSolarCycler((TileEntitySolarCycler) world.getTileEntity(new BlockPos(x, y, z)), player.inventory);
             default:
                 return null;
         }

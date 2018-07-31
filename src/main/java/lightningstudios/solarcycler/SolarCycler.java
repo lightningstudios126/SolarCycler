@@ -29,6 +29,7 @@ public class SolarCycler {
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new ModRegistrar());
+        ModRegistrar.registerMessages();
     }
     
     @Mod.EventHandler
