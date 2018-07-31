@@ -1,7 +1,6 @@
 package lightningstudios.solarcycler.tile;
 
 import lightningstudios.solarcycler.item.ItemSunstone;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -17,7 +16,7 @@ public class TileEntitySolarCycler extends TileEntity {
     public String NBT_TIME = "TargetTime";
     public String NBT_INVENTORY = "Inventory";
     
-    private int targetTime;
+    private int targetTime = 5678;
     private ItemStackHandler itemStackHandler = new ItemStackHandler(1) {
         
         @Override
@@ -77,7 +76,7 @@ public class TileEntitySolarCycler extends TileEntity {
         return super.getCapability(capability, facing);
     }
     
-    public boolean canInteractWith(EntityPlayer player) {
-        return !isInvalid() && player.getDistanceSq(pos.add(0.5, 0.5, 0.5)) < 64D;
+    public int getTargetTime() {
+        return targetTime;
     }
 }

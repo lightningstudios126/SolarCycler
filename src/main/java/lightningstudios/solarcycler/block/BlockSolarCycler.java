@@ -3,8 +3,10 @@ package lightningstudios.solarcycler.block;
 import lightningstudios.solarcycler.ModRegistrar;
 import lightningstudios.solarcycler.SolarCycler;
 import lightningstudios.solarcycler.tile.TileEntitySolarCycler;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,7 +14,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -43,22 +44,7 @@ public class BlockSolarCycler extends BlockBase {
     void setTime(World worldIn, int time) {
         // skips to the next day at the specified time
         worldIn.setWorldTime((worldIn.getWorldTime() / ticksPerDay + 1) * ticksPerDay + time);
-    }
     
-    @Override
-    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
-        if (side == null) return false;
-        switch (side) {
-            case DOWN:
-            case UP:
-                return false;
-            case NORTH:
-            case SOUTH:
-            case WEST:
-            case EAST:
-                return true;
-        }
-        return false;
     }
     
     @Override
@@ -82,5 +68,28 @@ public class BlockSolarCycler extends BlockBase {
             worldIn.spawnEntity(item);
         }
         super.breakBlock(worldIn, pos, state);
+    }
+    
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        boolean powered = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up());
+        
+        if (powered) {
+            setTime(worldIn, ((TileEntitySolarCycler) worldIn.getTileEntity(pos)).getTargetTime());
+            EntityLightningBolt bolt = new EntityLightningBolt(worldIn, pos.getX(), pos.getY() + 1, pos.getZ(), true);
+            worldIn.addWeatherEffect(bolt);
+            worldIn.spawnEntity(bolt);
+        }
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    }
+    
+    @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return super.hasComparatorInputOverride(state);
+    }
+    
+    @Override
+    public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos) {
+        return super.getComparatorInputOverride(blockState, worldIn, pos);
     }
 }
