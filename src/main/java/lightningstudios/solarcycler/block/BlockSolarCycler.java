@@ -5,13 +5,17 @@ import lightningstudios.solarcycler.SolarCycler;
 import lightningstudios.solarcycler.tile.TileEntitySolarCycler;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
@@ -66,5 +70,17 @@ public class BlockSolarCycler extends BlockBase {
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileEntitySolarCycler();
+    }
+    
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntitySolarCycler tile = ((TileEntitySolarCycler) worldIn.getTileEntity(pos));
+        IItemHandler itemHandler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        ItemStack stack = itemHandler.getStackInSlot(0);
+        if (!stack.isEmpty()) {
+            EntityItem item = new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack);
+            worldIn.spawnEntity(item);
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 }

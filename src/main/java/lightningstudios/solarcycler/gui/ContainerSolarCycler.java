@@ -49,6 +49,8 @@ public class ContainerSolarCycler extends Container {
         }
     }
     
+    // taken from shadowfacts's 1.12 modding tutorial for TileEntity w/Inventory+GUI
+    // https://shadowfacts.net/tutorials/forge-modding-112/tile-entities-inventory-gui/
     @Nullable
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
