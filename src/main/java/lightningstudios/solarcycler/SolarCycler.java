@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 @Mod(modid = SolarCycler.MODID, name = SolarCycler.MODNAME, version = SolarCycler.VERSION, useMetadata = true)
 public class SolarCycler {
@@ -27,6 +28,7 @@ public class SolarCycler {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new ModRegistrar());
     }
     
     @Mod.EventHandler
@@ -45,13 +47,16 @@ public class SolarCycler {
         public static void registerItems(RegistryEvent.Register<Item> event) {
             ModRegistrar.registerItems(event.getRegistry());
         }
+    
         @SubscribeEvent
         public static void registerBlocks(RegistryEvent.Register<Block> event) {
             ModRegistrar.registerBlocks(event.getRegistry());
         }
+    
         @SubscribeEvent
         public static void registerModels(ModelRegistryEvent event) {
             ModRegistrar.registerModels();
         }
+    
     }
 }
