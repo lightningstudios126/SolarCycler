@@ -2,6 +2,7 @@ package lightningstudios.solarcycler;
 
 import lightningstudios.solarcycler.block.BlockBase;
 import lightningstudios.solarcycler.block.BlockSolarCycler;
+import lightningstudios.solarcycler.block.BlockSunstone;
 import lightningstudios.solarcycler.gui.ContainerSolarCycler;
 import lightningstudios.solarcycler.gui.GuiSolarCycler;
 import lightningstudios.solarcycler.item.ItemBase;
@@ -39,9 +40,8 @@ public class ModRegistrar implements IGuiHandler {
     public static ArrayList<BlockBase> blocksToRegister = new ArrayList<>();
     
     public static Item sunstone = new ItemSunstone("sunstone").setCreativeTab(CreativeTabs.MATERIALS);
-    public static Block block_sunstone = new BlockBase(Material.IRON, "block_sunstone").setLightLevel(1.0F).setHardness(3).setResistance(5).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+    public static Block block_sunstone = new BlockSunstone(Material.IRON, "block_sunstone").setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
     public static Block solar_cycler = new BlockSolarCycler("solar_cycler").setCreativeTab(CreativeTabs.REDSTONE);
-    ;
     
     public static void addItemToRegister(ItemBase itemBase) {
         itemsToRegister.add(itemBase);

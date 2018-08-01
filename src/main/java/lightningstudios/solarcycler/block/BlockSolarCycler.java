@@ -34,6 +34,7 @@ public class BlockSolarCycler extends BlockBase {
         this.setHardness(3f);
         this.setResistance(5f);
         this.setLightLevel(1.0f);
+        this.setHarvestLevel("pickaxe", 1);
     }
     
     public static int ticksToSkip(int currentWorldTick, int targetWorldTick) {
