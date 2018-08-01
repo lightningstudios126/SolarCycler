@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
@@ -67,6 +68,11 @@ public class ModRegistrar implements IGuiHandler {
             item.registerItemModel();
         for (BlockBase block : blocksToRegister)
             block.registerItemModel();
+    }
+    
+    public static void registerOreDictionary() {
+        OreDictionary.registerOre("gemSunstone", sunstone);
+        OreDictionary.registerOre("blockSunstone", block_sunstone);
     }
     
     @SideOnly(Side.CLIENT)

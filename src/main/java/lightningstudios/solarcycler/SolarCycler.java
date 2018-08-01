@@ -35,12 +35,14 @@ public class SolarCycler {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         proxy.init(event);
+        ModRegistrar.registerOreDictionary();
     }
     
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
     }
+    
     
     @Mod.EventBusSubscriber
     public static class RegistrationHandler {

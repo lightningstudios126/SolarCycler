@@ -3,13 +3,13 @@
     "item": "solarcycler:sunstone"
   },
   "pattern": [
-    " d ",
-    "dgd",
-    " d "
+    " g ",
+    "gbg",
+    " g "
   ],
   "type": "forge:ore_shaped",
   "key": {
-    "d": {
+    "b": {
       "type": "forge:ore_dict",
       "ore": "blockGlass"
     },

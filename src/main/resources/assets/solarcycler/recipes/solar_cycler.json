@@ -3,17 +3,13 @@
     "item": "solarcycler:solar_cycler"
   },
   "pattern": [
-    "cqc",
-    "gsg",
-    "ggg"
+    "qqq",
+    "ucu",
+    "usu"
   ],
   "type": "forge:ore_shaped",
   "key": {
-    "c": {
-      "type": "forge:ore_dict",
-      "ore": "blockGlass"
-    },
-    "g": {
+    "u": {
       "type": "forge:ore_dict",
       "ore": "ingotGold"
     },
@@ -24,6 +20,9 @@
     "q": {
       "type": "forge:ore_dict",
       "ore": "blockQuartz"
+    },
+    "c": {
+      "item": "minecraft:clock"
     }
   }
 }
