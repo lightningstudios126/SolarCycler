@@ -86,17 +86,17 @@ public class TileEntitySolarCycler extends TileEntity {
         return targetTime;
     }
     
+    public void setTargetTime(int time) {
+        this.targetTime = time;
+        this.markDirty();
+    }
+    
     public boolean getRedstonePower() {
         return redstonePower;
     }
     
     public void setRedstonePower(boolean redstonePower) {
         this.redstonePower = redstonePower;
-        this.markDirty();
-    }
-    
-    public void setTargetTime(int time) {
-        this.targetTime = time;
         this.markDirty();
     }
     
@@ -126,9 +126,20 @@ public class TileEntitySolarCycler extends TileEntity {
     }
     
     public int getCost() {
-        int rate = ModConfig.fuelMode == ModConfig.EnumFuelMode.PER_OPERATION ? 1 :
-                BlockSolarCycler.ticksToSkip(((int) world.getWorldTime()), targetTime) / ModConfig.timeUnit;
+        int ticks = BlockSolarCycler.ticksToSkip(((int) world.getWorldTime()), targetTime);
+        int rate = (ModConfig.fuelMode == ModConfig.EnumFuelMode.PER_OPERATION ? 1 :
+                (ticks / ModConfig.timeUnit) + ((ticks % ModConfig.timeUnit == 0) ? 0 : 1));
         return rate * ModConfig.usageRate;
+    }
+    
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        return writeToNBT(new NBTTagCompound());
+    }
+    
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        readFromNBT(tag);
     }
     
     public enum EnumButtons {
@@ -138,22 +149,5 @@ public class TileEntitySolarCycler extends TileEntity {
         EnumButtons(int time) {
             this.time = time;
         }
-    }
-    
-    @Override
-    public NBTTagCompound getUpdateTag() {
-        return writeToNBT(new NBTTagCompound());
-    }
-    
-    /**
-     * Called when the chunk's TE update tag, gotten from {@link #getUpdateTag()}, is received on the client.
-     * <p>
-     * Used to handle this tag in a special way. By default this simply calls {@link #readFromNBT(NBTTagCompound)}.
-     *
-     * @param tag The {@link NBTTagCompound} sent from {@link #getUpdateTag()}
-     */
-    @Override
-    public void handleUpdateTag(NBTTagCompound tag) {
-        readFromNBT(tag);
     }
 }
