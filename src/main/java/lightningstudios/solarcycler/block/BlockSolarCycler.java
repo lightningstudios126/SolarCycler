@@ -17,6 +17,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
@@ -116,7 +118,7 @@ public class BlockSolarCycler extends BlockBase {
     }
     
     private void setWorldTime(World worldIn, int time) {
-        worldIn.setWorldTime(worldIn.getWorldTime() + ticksToSkip(((int) worldIn.getWorldTime()), time));
+        worldIn.setWorldTime(worldIn.getWorldTime() + ticksToSkip((int) worldIn.getWorldTime(), time));
     }
     
     private void changeTime(World worldIn, BlockPos pos) {
@@ -127,8 +129,14 @@ public class BlockSolarCycler extends BlockBase {
     
         if (skySeen && fuelNeedsMet) {
             tile.subtractFuel(tile.getCost(), false);
-            setWorldTime(worldIn, tile.getTargetTime());
-        
+            for (WorldServer world : DimensionManager.getWorlds()) {
+                if (worldIn.provider.getDimension() == world.provider.getDimension()) {
+//                    System.out.println("Dimension ID: " + world.provider.getDimension());
+//                    System.out.println("world start time: " + world.getWorldTime());
+                    setWorldTime(world, tile.getTargetTime());
+//                    System.out.println("world end time: " + world.getWorldTime());
+                }
+            }
             if (ModConfig.doLightningEffect) {
                 EntityLightningBolt bolt = new EntityLightningBolt(worldIn, pos.getX(), pos.getY() + 1, pos.getZ(), true);
                 worldIn.addWeatherEffect(bolt);
