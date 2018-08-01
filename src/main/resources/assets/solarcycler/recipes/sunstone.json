@@ -1,0 +1,21 @@
+{
+  "result": {
+    "item": "solarcycler:sunstone"
+  },
+  "pattern": [
+    " d ",
+    "dgd",
+    " d "
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "d": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "dustGlowstone"
+    }
+  }
+}

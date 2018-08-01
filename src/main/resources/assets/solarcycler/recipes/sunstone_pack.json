@@ -1,0 +1,16 @@
+{
+  "result": {
+    "item": "solarcycler:block_sunstone"
+  },
+  "pattern": [
+    "dd",
+    "dd"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "d": {
+      "type": "forge:ore_dict",
+      "ore": "gemSunstone"
+    }
+  }
+}

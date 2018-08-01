@@ -1,0 +1,29 @@
+{
+  "result": {
+    "item": "solarcycler:solar_cycler"
+  },
+  "pattern": [
+    "cqc",
+    "gsg",
+    "ggg"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "c": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    },
+    "g": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "blockSunstone"
+    },
+    "q": {
+      "type": "forge:ore_dict",
+      "ore": "blockQuartz"
+    }
+  }
+}
