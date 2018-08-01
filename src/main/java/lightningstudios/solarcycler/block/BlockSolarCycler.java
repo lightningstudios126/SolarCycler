@@ -25,11 +25,19 @@ import java.util.Random;
 
 public class BlockSolarCycler extends BlockBase {
     
-    public static final int ticksPerHour = 1000;
     public static final int ticksPerDay = 24000;
     
     public BlockSolarCycler(String name) {
         super(Material.IRON, name);
+        this.setHardness(3f);
+        this.setResistance(5f);
+        this.setLightLevel(1.0f);
+    }
+    
+    public static int ticksToSkip(int currentWorldTick, int targetWorldTick) {
+        int ticks = (targetWorldTick + ticksPerDay - currentWorldTick) % ticksPerDay;
+        ticks += ticks > 0 ? 0 : ticksPerDay;
+        return ticks;
     }
     
     @Override
@@ -80,12 +88,6 @@ public class BlockSolarCycler extends BlockBase {
     public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
         if (world instanceof World)
             updateRedstone(((World) world), pos);
-    }
-    
-    public static int ticksToSkip(int currentWorldTick, int targetWorldTick) {
-        int ticks = (targetWorldTick + ticksPerDay - currentWorldTick) % ticksPerDay;
-        ticks += ticks > 0 ? 0 : ticksPerDay;
-        return ticks;
     }
     
     @Override
