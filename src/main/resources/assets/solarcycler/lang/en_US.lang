@@ -1,5 +1,5 @@
 item.sunstone.name=Sunstone
-tile.block_sunstone.name=Block of Sunstone
+tile.block_sunstone.name=Sunstone Block
 tile.solar_cycler.name=Solar Cycler
 
 buttons.tooltip.0=Sunrise
