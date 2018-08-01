@@ -1,5 +1,6 @@
 package lightningstudios.solarcycler.block;
 
+import lightningstudios.solarcycler.ModConfig;
 import lightningstudios.solarcycler.ModRegistrar;
 import lightningstudios.solarcycler.SolarCycler;
 import lightningstudios.solarcycler.tile.TileEntitySolarCycler;
@@ -24,7 +25,8 @@ import java.util.Random;
 
 public class BlockSolarCycler extends BlockBase {
     
-    public static long ticksPerDay = 24000L;
+    public static final int ticksPerHour = 1000;
+    public static final int ticksPerDay = 24000;
     
     public BlockSolarCycler(String name) {
         super(Material.IRON, name);
@@ -80,20 +82,10 @@ public class BlockSolarCycler extends BlockBase {
             updateRedstone(((World) world), pos);
     }
     
-    private void updateRedstone(World worldIn, BlockPos pos) {
-        if (!worldIn.isRemote) {
-            TileEntity temp = worldIn.getTileEntity(pos);
-            if (temp instanceof TileEntitySolarCycler) {
-                TileEntitySolarCycler tile = ((TileEntitySolarCycler) temp);
-                boolean powered = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
-                boolean wasPowered = tile.getRedstone();
-                if (powered && !wasPowered) {
-                    worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
-                    tile.setRedstonePower(true);
-                } else if (!powered && wasPowered)
-                    tile.setRedstonePower(false);
-            }
-        }
+    public static int ticksToSkip(int currentWorldTick, int targetWorldTick) {
+        int ticks = (targetWorldTick + ticksPerDay - currentWorldTick) % ticksPerDay;
+        ticks += ticks > 0 ? 0 : ticksPerDay;
+        return ticks;
     }
     
     @Override
@@ -105,15 +97,43 @@ public class BlockSolarCycler extends BlockBase {
         }
     }
     
-    void setWorldTime(World worldIn, int time) {
-        boolean skipNextDay = worldIn.getWorldTime() % ticksPerDay > time;
-        worldIn.setWorldTime((worldIn.getWorldTime() / ticksPerDay + (skipNextDay ? 1 : 0)) * ticksPerDay + time);
+    private void updateRedstone(World worldIn, BlockPos pos) {
+        if (!worldIn.isRemote) {
+            TileEntity temp = worldIn.getTileEntity(pos);
+            if (temp instanceof TileEntitySolarCycler) {
+                TileEntitySolarCycler tile = ((TileEntitySolarCycler) temp);
+                boolean powered = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
+                boolean wasPowered = tile.getRedstonePower();
+                if (powered && !wasPowered) {
+                    worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
+                    tile.setRedstonePower(true);
+                } else if (!powered && wasPowered)
+                    tile.setRedstonePower(false);
+            }
+        }
+    }
+    
+    private void setWorldTime(World worldIn, int time) {
+        worldIn.setWorldTime(worldIn.getWorldTime() + ticksToSkip(((int) worldIn.getWorldTime()), time));
     }
     
     private void changeTime(World worldIn, BlockPos pos) {
-        setWorldTime(worldIn, ((TileEntitySolarCycler) worldIn.getTileEntity(pos)).getTargetTime());
-        EntityLightningBolt bolt = new EntityLightningBolt(worldIn, pos.getX(), pos.getY() + 1, pos.getZ(), true);
-        worldIn.addWeatherEffect(bolt);
-        worldIn.spawnEntity(bolt);
+        TileEntitySolarCycler tile = (TileEntitySolarCycler) worldIn.getTileEntity(pos);
+    
+        boolean skySeen = !ModConfig.needsSky || worldIn.canBlockSeeSky(pos.up());
+        boolean fuelNeedsMet = ModConfig.usageRate != 0 && tile.subtractFuel(tile.getCost(), true);
+    
+        if (skySeen && fuelNeedsMet) {
+            tile.subtractFuel(tile.getCost(), false);
+            setWorldTime(worldIn, tile.getTargetTime());
+        
+            if (ModConfig.doLightningEffect) {
+                EntityLightningBolt bolt = new EntityLightningBolt(worldIn, pos.getX(), pos.getY() + 1, pos.getZ(), true);
+                worldIn.addWeatherEffect(bolt);
+                worldIn.spawnEntity(bolt);
+            }
+        }
     }
+    
+    
 }

@@ -6,3 +6,5 @@ buttons.tooltip.0=Sunrise
 buttons.tooltip.1=Noon
 buttons.tooltip.2=Sunset
 buttons.tooltip.3=Midnight
+
+gui.solarcycler.cost=Cost

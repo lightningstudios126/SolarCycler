@@ -37,12 +37,8 @@ public class ModRegistrar implements IGuiHandler {
     public static ArrayList<ItemBase> itemsToRegister = new ArrayList<>();
     public static ArrayList<BlockBase> blocksToRegister = new ArrayList<>();
     
-    static {
-        // initialize using the registering constructor built into the base classes
-        new ItemSunstone("sunstone").setCreativeTab(CreativeTabs.MATERIALS);
-        new BlockBase(Material.IRON, "block_sunstone").setLightLevel(1.0F).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
-    }
-    
+    public static Item sunstone = new ItemSunstone("sunstone").setCreativeTab(CreativeTabs.MATERIALS);
+    public static Block block_sunstone = new BlockBase(Material.IRON, "block_sunstone").setLightLevel(1.0F).setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
     public static Block solar_cycler = new BlockSolarCycler("solar_cycler").setLightLevel(1.0F).setCreativeTab(CreativeTabs.REDSTONE);
     
     public static void addItemToRegister(ItemBase itemBase) {

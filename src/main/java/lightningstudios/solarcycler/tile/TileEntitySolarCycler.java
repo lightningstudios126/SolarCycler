@@ -1,5 +1,7 @@
 package lightningstudios.solarcycler.tile;
 
+import lightningstudios.solarcycler.ModConfig;
+import lightningstudios.solarcycler.block.BlockSolarCycler;
 import lightningstudios.solarcycler.item.ItemSunstone;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,14 +15,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TileEntitySolarCycler extends TileEntity {
-    public String NBT_BUTTON = "SelectedButton";
     public String NBT_TIME = "TargetTime";
     public String NBT_INVENTORY = "Inventory";
     public String NBT_POWER = "Powered";
+    public String NBT_BUTTON = "SelectedButton";
     
-    private int targetTime = 6000;
-    private boolean redstonePower = false;
     private EnumButtons selectedButton = EnumButtons.NOON;
+    private int targetTime = selectedButton.time;
+    private boolean redstonePower = false;
     
     private ItemStackHandler itemStackHandler = new ItemStackHandler(1) {
         @Override
@@ -33,8 +35,10 @@ public class TileEntitySolarCycler extends TileEntity {
         @Nonnull
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            if (!(stack.getItem() instanceof ItemSunstone))
+            if (!(stack.getItem() instanceof ItemSunstone)) {
                 return stack;
+            }
+            
             return super.insertItem(slot, stack, simulate);
         }
     };
@@ -82,7 +86,7 @@ public class TileEntitySolarCycler extends TileEntity {
         return targetTime;
     }
     
-    public boolean getRedstone() {
+    public boolean getRedstonePower() {
         return redstonePower;
     }
     
@@ -100,14 +104,31 @@ public class TileEntitySolarCycler extends TileEntity {
         return selectedButton;
     }
     
-    public void setSelectedButton(EnumButtons button) {
-        this.selectedButton = button;
+    public void setSelectedButton(EnumButtons selectedButton) {
+        this.selectedButton = selectedButton;
+        this.setTargetTime(selectedButton.time);
         this.markDirty();
     }
     
     public void updateButton(EnumButtons buttonPressed) {
-        setTargetTime(buttonPressed.time);
         setSelectedButton(buttonPressed);
+    }
+    
+    public boolean subtractFuel(int cost, boolean simulate) {
+        int count = itemStackHandler.getStackInSlot(0).getCount();
+        if (count < cost)
+            return false;
+        else {
+            if (!simulate)
+                itemStackHandler.extractItem(0, cost, false);
+            return true;
+        }
+    }
+    
+    public int getCost() {
+        int rate = ModConfig.fuelMode == ModConfig.EnumFuelMode.PER_OPERATION ? 1 :
+                BlockSolarCycler.ticksToSkip(((int) world.getWorldTime()), targetTime) / ModConfig.timeUnit;
+        return rate * ModConfig.usageRate;
     }
     
     public enum EnumButtons {
@@ -117,5 +138,22 @@ public class TileEntitySolarCycler extends TileEntity {
         EnumButtons(int time) {
             this.time = time;
         }
+    }
+    
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        return writeToNBT(new NBTTagCompound());
+    }
+    
+    /**
+     * Called when the chunk's TE update tag, gotten from {@link #getUpdateTag()}, is received on the client.
+     * <p>
+     * Used to handle this tag in a special way. By default this simply calls {@link #readFromNBT(NBTTagCompound)}.
+     *
+     * @param tag The {@link NBTTagCompound} sent from {@link #getUpdateTag()}
+     */
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        readFromNBT(tag);
     }
 }

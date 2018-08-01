@@ -27,12 +27,12 @@ public class GuiSolarCycler extends GuiContainer {
     public void initGui() {
         super.initGui();
         int[][] buttonPos = {{57, 37}, {78, 16}, {99, 37}, {78, 58}};
-    
-        for (int i = 0; i < 4; i++)
-            buttonList.add(new TextureButton(BG_TEXTURE, i,
-                    guiLeft + buttonPos[i][0], guiTop + buttonPos[i][1],
+        for (int i = 0; i < 4; i++) {
+            TextureButton button = new TextureButton(BG_TEXTURE, i, guiLeft + buttonPos[i][0], guiTop + buttonPos[i][1],
                     i * 20 + 176, 0, 20, 20,
-                    I18n.format("buttons.tooltip." + i)));
+                    I18n.format("buttons.tooltip." + i));
+            addButton(button);
+        }
     }
     
     @Override
@@ -47,8 +47,12 @@ public class GuiSolarCycler extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         String name = I18n.format(ModRegistrar.solar_cycler.getUnlocalizedName() + ".name");
-        fontRenderer.drawString(name, xSize / 2 - fontRenderer.getStringWidth(name) / 2, 6, 0x404040);
+        fontRenderer.drawString(name, (xSize - fontRenderer.getStringWidth(name)) / 2, 6, 0x404040);
         fontRenderer.drawString(playerInv.getDisplayName().getUnformattedText(), 8, ySize - 94, 0x404040);
+    
+        String cost = I18n.format("gui.solarcycler.cost") + ":";
+        fontRenderer.drawString(cost, 14, 38, 0x404040);
+        fontRenderer.drawString(tile.getCost() + "", 14, 48, 0x404040);
     }
     
     @Override
@@ -64,7 +68,8 @@ public class GuiSolarCycler extends GuiContainer {
     @Override
     public void updateScreen() {
         for (GuiButton button : buttonList) {
-            button.enabled = button.id != tile.getSelectedButton().ordinal();
+            if (button instanceof TextureButton)
+                button.enabled = button.id != tile.getSelectedButton().ordinal();
         }
     }
     
@@ -73,4 +78,5 @@ public class GuiSolarCycler extends GuiContainer {
         ModRegistrar.sendButtonPacket(tile, TileEntitySolarCycler.EnumButtons.values()[button.id]);
         tile.updateButton(TileEntitySolarCycler.EnumButtons.values()[button.id]);
     }
+    
 }

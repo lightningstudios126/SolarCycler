@@ -9,8 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nullable;
-
 public class ContainerSolarCycler extends Container {
     private static int SLOT_SPACING = 18;
     
@@ -48,7 +46,6 @@ public class ContainerSolarCycler extends Container {
     
     // taken from shadowfacts's 1.12 modding tutorial for TileEntity w/Inventory+GUI
     // https://shadowfacts.net/tutorials/forge-modding-112/tile-entities-inventory-gui/
-    @Nullable
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
         ItemStack copy = ItemStack.EMPTY;
@@ -60,10 +57,10 @@ public class ContainerSolarCycler extends Container {
             
             int containerSlots = inventorySlots.size() - player.inventory.mainInventory.size();
     
-            if (index < containerSlots)
+            if (index < containerSlots) {
                 if (!this.mergeItemStack(orig, containerSlots, inventorySlots.size(), true))
                     return ItemStack.EMPTY;
-                else if (!this.mergeItemStack(orig, 0, containerSlots, false))
+            } else if (!this.mergeItemStack(orig, 0, containerSlots, false))
                 return ItemStack.EMPTY;
     
             if (orig.getCount() == 0)

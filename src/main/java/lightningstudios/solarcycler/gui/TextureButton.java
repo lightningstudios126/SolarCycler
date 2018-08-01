@@ -21,10 +21,6 @@ public class TextureButton extends GuiButton {
         this.hoverText = hoverText;
     }
     
-    public TextureButton(ResourceLocation resource, int ID, int x, int y, int textureX, int textureY, int width, int height) {
-        this(resource, ID, x, y, textureX, textureY, width, height, "");
-    }
-    
     @Override
     public void drawButton(Minecraft minecraft, int mx, int my, float partialTicks) {
         if (this.visible) {
